@@ -8,7 +8,7 @@ GAME RULES:
 - The first player to reach 100 points on GLOBAL score wins the game
 
 */
-let scores, roundScore, activePlayer, gamePlaying;
+let scores, roundScore, activePlayer, gamePlaying, prevDice;
 init();
 
 
@@ -16,20 +16,29 @@ document.querySelector(".btn-roll").addEventListener('click', () => {
     if(gamePlaying) {
         //Generate random number
         let dice = Math.floor(Math.random() * 6) + 1;
+        console.log(dice, prevDice);
 
         //Display the results
         let diceDOM = document.querySelector('.dice');
         diceDOM.style.display = 'block';
         diceDOM.src = "dice-" + dice + ".png";
-
-        //Update the round score IF the rolled number was NOT a 1
-        if (dice !== 1) {
-            //Add score
-            roundScore += dice;
-            document.querySelector('#current-' + activePlayer).textContent = roundScore;
-        } else {
+        // Reset score and change player IF 6 sixs are rolled in a row
+        if(dice === 6 && prevDice === 6){
+            scores[activePlayer] = 0;
+            document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
             nextPlayer();
+        }else {
+            //Update the round score IF the rolled number was NOT a 1
+            if (dice !== 1) {
+                //Add score
+                roundScore += dice;
+                document.querySelector('#current-' + activePlayer).textContent = roundScore;
+            } else {
+                prevDice = 0;
+                nextPlayer();
+            }
         }
+        prevDice = dice;
     }
 });
 document.querySelector('.btn-hold').addEventListener('click', () => {
@@ -49,6 +58,7 @@ document.querySelector('.btn-hold').addEventListener('click', () => {
             gamePlaying = false;
         } else {
             //Next player
+            prevDice = 0;
             nextPlayer();
         }
     }
@@ -73,6 +83,7 @@ function init(){
     activePlayer = 0;
     roundScore = 0;
     gamePlaying = true;
+    prevDice = 0;
 
     document.querySelector('.dice').style.display = 'none';
     document.getElementById("score-0").textContent = '0';
