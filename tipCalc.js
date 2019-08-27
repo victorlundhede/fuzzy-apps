@@ -38,7 +38,6 @@ let mark = {
             this.tips[i] = procentage*bill;
             this.finalValue[i] = bill + (bill * procentage);
         }
-
     }
 };
 
