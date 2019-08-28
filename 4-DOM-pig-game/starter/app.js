@@ -8,7 +8,7 @@ GAME RULES:
 - The first player to reach 100 points on GLOBAL score wins the game
 
 */
-let scores, roundScore, activePlayer, gamePlaying, prevDice, winningScore;
+let scores, roundScore, activePlayer, gamePlaying;
 init();
 
 
@@ -17,7 +17,6 @@ document.querySelector(".btn-roll").addEventListener('click', () => {
         //Generate random number
         let diceLeft = Math.floor(Math.random() * 6) + 1;
         let diceRight = Math.floor(Math.random() * 6) + 1;
-        console.log(diceLeft, diceRight, prevDice);
 
         //Display the results
         let diceDOMLeft = document.querySelector('.left');
@@ -32,18 +31,14 @@ document.querySelector(".btn-roll").addEventListener('click', () => {
             scores[activePlayer] = 0;
             document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
             nextPlayer();
-        }else {
+        }else if (diceLeft !== 1 && diceRight !== 1) {
             //Update the round score IF the rolled number was NOT a 1
-            if (diceLeft !== 1 && diceRight !== 1) {
                 //Add score
                 roundScore += diceLeft + diceRight;
                 document.querySelector('#current-' + activePlayer).textContent = roundScore;
             } else {
-                prevDice = 0;
                 nextPlayer();
             }
-        }
-        prevDice = dice;
     }
 });
 document.querySelector('.btn-hold').addEventListener('click', () => {
@@ -55,7 +50,14 @@ document.querySelector('.btn-hold').addEventListener('click', () => {
         document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 
         //Check if player won the game
-        winningScore = document.querySelector("#winningScore").value;
+        let input = document.querySelector("#winningScore").value;
+        let winningScore;
+        if(input){
+            winningScore = input;
+        }else{
+            winningScore = 100;
+        }
+
         if (scores[activePlayer] >= winningScore) {
             document.querySelector('#name-' + activePlayer).textContent = "Winner!";
             document.querySelector('.left').style.display = 'none';
@@ -65,7 +67,6 @@ document.querySelector('.btn-hold').addEventListener('click', () => {
             gamePlaying = false;
         } else {
             //Next player
-            prevDice = 0;
             nextPlayer();
         }
     }
@@ -91,7 +92,6 @@ function init(){
     activePlayer = 0;
     roundScore = 0;
     gamePlaying = true;
-    prevDice = 0;
 
     document.querySelector('.left').style.display = 'none';
     document.querySelector('.right').style.display = 'none';

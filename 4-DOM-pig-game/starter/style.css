@@ -126,6 +126,8 @@ button {
     left: 50%;
     transform: translateX(-50%);
     bottom: 10%;
+    text-transform: uppercase;
+    padding: 10px;
 }
 
 button:hover { font-weight: 600; }
