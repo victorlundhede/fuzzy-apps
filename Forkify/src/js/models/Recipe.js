@@ -31,4 +31,72 @@ export default class Recipe{
     calcServings(){
         this.servings = 4;
     }
+
+    parseIngredients(){
+        const unitLong = ['tablespoons', 'tablespoon','ounces','ounce','teaspoons','teaspoon','cups','pounds'];
+        const unitShort = ['tbsp','tbsp','oz','oz','tsp','tsp','cup','pound'];
+        const units = [...unitShort, 'kg', 'g'];
+
+        const newIngredients = this.ingredients.map(el => {
+            //Uniform units
+            let ingredient = el.toLowerCase();
+            unitLong.forEach((unit, i) => {
+                ingredient = ingredient.replace(unit, unitShort[i])
+            });
+
+            //Remove parantheses
+            ingredient = ingredient.replace(/ *\([^)]*\) */g, ' ');
+
+            //Parse ingredients into count, unit and ingredient
+            const arrIng = ingredient.split(' ');
+            const unitIndex = arrIng.findIndex(el2 => units.includes(el2));
+
+            let objIng;
+            if(unitIndex > -1){
+                //There is a unit
+                const arrCount = arrIng.slice(0, unitIndex);
+                //Ex. 4 1/2 cups, arrCount is [4, 1/2] --> eval("4+1/2) --> 4.5
+                //Ex. 4 cups, arrCount is [4]
+                let count;
+                if(arrCount.length === 1){
+                    count = eval(arrCount[0].replace('-', '+'));
+                }else{
+                    count = eval(arrIng.slice(0, unitIndex).join('+'));
+                }
+                objIng = {
+                    count: count,
+                    unit: arrIng[unitIndex],
+                    ingredient: arrIng.slice(unitIndex + 1).join(' ')
+                }
+            }else if(Number(arrIng[0])){
+                //There is NO unit, but 1st element is a number
+                objIng = {
+                    count: Number(arrIng[0]),
+                    unit: '',
+                    ingredient: arrIng.slice(1).join(' ')
+                }
+            } else if(unitIndex === -1){
+                //there is NO unit and NO number in 1st position
+                objIng = {
+                    count: 1,
+                    unit: '',
+                    ingredient: ingredient
+                }
+            }
+            return objIng;
+        });
+        this.ingredients = newIngredients;
+    }
+
+    updateServings (type){
+        //Servings
+        const newServings = type === 'dec' ? this.servings - 1 : this.servings + 1;
+
+        //Ingredients
+        this.ingredients.forEach(ing => {
+            ing.count *= (newServings / this.servings);
+        });
+
+        this.servings = newServings;
+    }
 }
